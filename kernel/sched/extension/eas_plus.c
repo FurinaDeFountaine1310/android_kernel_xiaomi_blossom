@@ -868,8 +868,6 @@ static void task_rotate_work_func(struct work_struct *work)
 			task_cpu(wr->dst_task), task_cpu(wr->src_task));
 
 	if (ret == 0) {
-		update_eas_uclamp_min(EAS_UCLAMP_KIR_BIG_TASK, CGROUP_TA,
-				scale_to_percent(SCHED_CAPACITY_SCALE));
 		set_uclamp = true;
 	}
 
@@ -889,7 +887,6 @@ static void task_rotate_work_func(struct work_struct *work)
 
 static void task_rotate_reset_uclamp_work_func(struct work_struct *work)
 {
-	update_eas_uclamp_min(EAS_UCLAMP_KIR_BIG_TASK, CGROUP_TA, 0);
 	set_uclamp = false;
 }
 
