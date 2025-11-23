@@ -249,8 +249,7 @@ config ARCH_HAS_FORTIFY_SOURCE
 config ARCH_HAS_SET_MEMORY
 	bool
 
-# Select if arch has all set_direct_map_invalid/default() functions
-config ARCH_HAS_SET_DIRECT_MAP
+config ARCH_HAS_CPU_FINALIZE_INIT
 	bool
 
 # Select if arch init_task must go in the __init_task_data section
@@ -442,9 +441,7 @@ config CC_HAS_STACKPROTECTOR_NONE
 
 config STACKPROTECTOR
 	bool "Stack Protector buffer overflow detection"
-	depends on HAVE_STACKPROTECTOR
-	depends on $(cc-option,-fstack-protector)
-	default y
+	default n
 	help
 	  This option turns on the "stack-protector" GCC feature. This
 	  feature puts, at the beginning of functions, a canary value on
@@ -466,9 +463,7 @@ config STACKPROTECTOR
 
 config STACKPROTECTOR_STRONG
 	bool "Strong Stack Protector"
-	depends on STACKPROTECTOR
-	depends on $(cc-option,-fstack-protector-strong)
-	default y
+	default n
 	help
 	  Functions will have the stack-protector canary logic added in any
 	  of the following conditions:
@@ -504,27 +499,18 @@ config ARCH_SUPPORTS_THINLTO
 
 config THINLTO
 	bool "Use clang ThinLTO (EXPERIMENTAL)"
-	depends on LTO_CLANG && ARCH_SUPPORTS_THINLTO
-	default y
+	default n
 	help
 	  Use ThinLTO to speed up Link Time Optimization.
 
-choice
-	prompt "Link-Time Optimization (LTO) (EXPERIMENTAL)"
-	default LTO_NONE
-	help
-	  This option turns on Link-Time Optimization (LTO).
-
 config LTO_NONE
 	bool "None"
+	default y
 
 config LTO_CLANG
 	bool "Use clang Link Time Optimization (LTO) (EXPERIMENTAL)"
-	depends on ARCH_SUPPORTS_LTO_CLANG
-	depends on !FTRACE_MCOUNT_RECORD || HAVE_C_RECORDMCOUNT
-	depends on !KASAN
-	depends on CC_IS_CLANG && LD_IS_LLD
 	select LTO
+	default n
 	help
           This option enables clang's Link Time Optimization (LTO), which allows
           the compiler to optimize the kernel globally at link time. If you
@@ -535,7 +521,6 @@ config LTO_CLANG
           If you select this option, you must compile the kernel with clang and
 	  LLD.
 
-endchoice
 
 config CFI
 	bool
@@ -574,7 +559,7 @@ config ARCH_SUPPORTS_SHADOW_CALL_STACK
 
 config SHADOW_CALL_STACK
 	bool "Clang Shadow Call Stack"
-	depends on ARCH_SUPPORTS_SHADOW_CALL_STACK
+	default n
 	help
 	  This option enables Clang's Shadow Call Stack, which uses a
 	  shadow stack to protect function return addresses from being
@@ -1007,8 +992,7 @@ config ARCH_HAS_RELR
 
 config RELR
 	bool "Use RELR relocation packing"
-	depends on ARCH_HAS_RELR && TOOLS_SUPPORT_RELR
-	default y
+	default n
 	help
 	  Store the kernel's dynamic relocations in the RELR relocation packing
 	  format. Requires a compatible linker (LLD supports this feature), as
@@ -1023,6 +1007,15 @@ config ARCH_HAS_NONLEAF_PMD_YOUNG
 	  accessed bit in non-leaf PMD entries when using them as part of linear
 	  address translations. Page table walkers that clear the accessed bit
 	  may use this capability to reduce their search space.
+
+config LLVM_POLLY
+	bool "Enable LLVM's polyhedral loop optimizer (Polly)"
+	default n
+	help
+	  This option enables LLVM's polyhedral loop optimizer known as Polly.
+	  Polly is able to optimize various loops throughout the kernel for
+	  maximum cache locality. This requires an LLVM toolchain explicitly
+	  compiled with Polly support.
 
 source "kernel/gcov/Kconfig"
 
