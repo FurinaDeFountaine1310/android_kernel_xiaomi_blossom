@@ -1,4 +1,4 @@
-   khnn/*
+/*
  * Header file for the BFQ I/O scheduler: data structures and
  * prototypes of interface functions among BFQ components.
  *
